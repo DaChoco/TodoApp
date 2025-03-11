@@ -1,0 +1,167 @@
+:root{
+    --totalbg: #ede9e9;
+    --todoboxColor: #fdfcfc;
+    --todoItemColor: #f8fafa;
+    --addbtnColor: #0789a6;
+    --normaltxt: #2e2d29;
+    --deletebg: #af0b19;
+    --darkbgtxt: #ffffff;
+
+    --loginbtn: #04abd0;
+    --smalltxt: #bebdbd;
+}
+
+*{
+    font-family: 'Roboto';
+    font-size: 22px;
+    color: var(--normaltxt);
+    transition: 0.25s;
+}
+
+body{
+    background-color: var(--totalbg);
+    padding: 0.5rem;
+}
+
+a{
+    text-decoration: none;
+    margin: 5px;
+}
+body{
+    margin: 0;
+}
+.delete-icon{
+    background-color: var(--deletebg);
+    color:var(--darkbgtxt);
+    padding: 0.4rem;
+}
+.todo-main-container{
+    margin: 0 auto;
+    width: min(700px, 100%);
+    background-color: var(--todoboxColor);
+    padding: 3rem;
+}
+.todo-container{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+#todocont{
+    padding-top: 1rem;
+}
+
+.fa-trash:hover{
+    scale: 1.2;
+}
+
+
+.search-container{
+    display: flex;
+    flex-direction: row;
+    margin: 0 auto;
+    width: 100%;
+    
+}
+    #additem{
+        width:60%;
+        padding: 0.5rem;
+        outline: none;
+        
+    }
+
+    #addbtn{
+        background-color: var(--addbtnColor);
+        border-radius: 0px;
+        color: var(--darkbgtxt);
+        width: 10%;
+        margin: auto;
+        margin-right: 0;
+        padding: 0.5rem;
+    }
+    #todocat{
+        width:20%;
+    }
+
+.todo-item{
+    margin: 10px 0;
+    padding: 0.25rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: var(--todoItemColor);
+}
+
+.todo-item .todo-content{
+    width: 80%;
+}
+.todo-content span{
+    padding-left: 5px;
+}
+
+.srchitem{
+    margin: 0 auto;
+    width: 100%;
+    font-size: 2rem;
+}
+
+/*----------------------LOGIN PAGE---------------------------------*/
+
+.login-main-container{
+    margin: 0 auto;
+    width: min(1000px, 100%)
+}
+
+.login-container{
+    border-radius: 1rem;
+    padding: 1rem;
+    
+}
+
+.login-content{
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    border-radius: 0.8rem;
+    background-color: var(--todoboxColor)
+}
+
+.login-content input{
+    padding: 0.5rem;
+    margin: 1rem;
+    font-size: 1rem;
+    border-radius: 0px;
+    outline: none;
+}
+
+.login-content h3{
+    margin: 8px 16px;
+}
+
+.NotLine{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.Submit-btn{
+    background-color: var(--loginbtn);
+    color: var(--darkbgtxt);
+
+}
+
+.welcometxt{
+    font-size: 2rem;
+}
+
+
+form{
+    overflow: visible;
+}
+
+/*----------------END of LOGIN PAGE----------------------------------*/
