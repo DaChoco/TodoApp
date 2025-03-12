@@ -72,13 +72,14 @@ def loggingIn(email, passwd):
         if not userDetail: 
             return jsonify({"LoginStatus": "Failed",
                             "Message": "This user does not exist on the system, they must register",
-                            "UserID": str(userDetail[0]),
+                            "UserID": "NONE",
                             "LoggedIn": "False"}
                             )
                     
         else:
             return jsonify({"LoginStatus": "Succeeded",
                              "Message": f"Welcome back {userDetail[0]}",
+                             "UserID": userDetail[1],
                              "LoggedIn": "True"})
     except pymysql.Error as e:
         return jsonify({"Message": f"An error has occured: {e}"}) 
@@ -107,8 +108,8 @@ def newTodo():
 @app.route("/login", methods=['Post'])
 def login():
     data = request.get_json()
-    userEmail = data.email
-    userPass = data.password
+    userEmail = data["email"]
+    userPass = data["password"]
 
     return loggingIn(userEmail, userPass)
 
@@ -117,8 +118,8 @@ def deletetodo(todoid):
     cursor = conn.cursor()
     try:
         cursor.execute("DELETE FROM tbltodo WHERE id = %s ", todoid)
-        currentTodos = cursor.fetchall()
-        return jsonify(currentTodos)
+        conn.commit()
+        return jsonify({"Success": True, "Message": "It works"})
     except pymysql.DatabaseError as e:
         conn.rollback()
         return jsonify({"Success": False, "Message": f"A database error has occured {e}"})
@@ -133,6 +134,7 @@ def updatetodo(todoid):
     query = request.args.get("ed", "")
     try:
         cursor.execute("UPDATE tblTodo SET content = %s WHERE id = %s ", (query,todoid))
+        conn.commit()
         return jsonify({"Success": True, "Message": "This database has been updated, thank you"})
     except pymysql.DatabaseError as e:
         conn.rollback()

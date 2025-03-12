@@ -1,10 +1,11 @@
-const todobox = document.getElementById("todocont")
-const addbar = document.getElementById("additem")
-const addbtn = document.getElementById("addbtn")
+const maxRetries = 3 //this is meant for the occasional client/network errors
 
 //Main javascript work? Complete
 
 window.addEventListener("DOMContentLoaded", async function(){
+    const todobox = document.getElementById("todocont")
+    const addbar = document.getElementById("additem")
+    const addbtn = document.getElementById("addbtn")
     const {current_userID, current_uuid, current_fname} = await getUser()
     let arrayIDs = await fetchTodos(current_userID)
     const deletebtns = document.querySelectorAll(".fa-trash")
@@ -12,12 +13,16 @@ window.addEventListener("DOMContentLoaded", async function(){
     const maincontent = this.document.querySelectorAll(".todotxt")
     const checkboxes = document.querySelectorAll(".chkchk")
     const userintro = this.document.getElementById("userintro")
+
+    if (!current_userID){
+        this.alert("You are not currently signed in. You will need to sign in")
+    }
     
     userintro.textContent = `${current_fname}'s TODO APP`
 
     deletebtns.forEach((del,index) => {
         del.addEventListener('click', async function(){
-            await deleteTodo(arrayIDs[index])
+            arrayIDs = await deleteTodo(arrayIDs[index])
             console.log(deleterowcontent[index])
             deleterowcontent[index].remove()
         }) 
@@ -67,17 +72,20 @@ window.addEventListener("DOMContentLoaded", async function(){
 
     async function deleteTodo(todoID){
         let url = `http://127.0.0.1:5000/delete/${todoID}`
+        let arrayIDs = []
     
         try{
             let response = await fetch(url, {method: "DELETE"})
             let data = await response.json()
+            console.log(data)
     
             if (data.Success == false){
-                alert("Todo deletion has failed")
+                alert("Todo deletion has failed due to the following: ", data.Message)
             }
             else if (data.Success == true)
                 alert("Todo deleted successfully")
                 arrayIDs = await fetchTodos(current_userID)
+                return arrayIDs
         }
         catch (error){console.log("Error deleting the todo: ", error)}
     

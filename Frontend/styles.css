@@ -36,6 +36,7 @@
 body{
     background-color: var(--totalbg);
     padding: 0;
+    padding-bottom: 1rem;
 }
 
 a{
@@ -67,6 +68,8 @@ ul{
     display: flex;
     flex-direction: row;
     margin-right: 0.1rem;
+    margin-left: 0.5rem;
+    height: max-content;
 }
 li{
     margin: 0 0.25rem;
@@ -83,6 +86,7 @@ li{
     width: min(700px, 100%);
     background-color: var(--todoboxColor);
     padding: 3rem;
+    border-radius: 0.25rem;
 }
 .todo-container{
     width: 100%;
