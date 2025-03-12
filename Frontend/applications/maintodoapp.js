@@ -4,14 +4,16 @@ const addbtn = document.getElementById("addbtn")
 
 //Main javascript work? Complete
 
-window.addEventListener("load", async function(){
-    const {current_userID, current_uuid} = await getUser()
+window.addEventListener("DOMContentLoaded", async function(){
+    const {current_userID, current_uuid, current_fname} = await getUser()
     let arrayIDs = await fetchTodos(current_userID)
     const deletebtns = document.querySelectorAll(".fa-trash")
     const deleterowcontent = document.querySelectorAll(".todo-item")
     const maincontent = this.document.querySelectorAll(".todotxt")
     const checkboxes = document.querySelectorAll(".chkchk")
+    const userintro = this.document.getElementById("userintro")
     
+    userintro.textContent = `${current_fname}'s TODO APP`
 
     deletebtns.forEach((del,index) => {
         del.addEventListener('click', async function(){
@@ -87,10 +89,11 @@ window.addEventListener("load", async function(){
             let data = await response.json()
             console.log(data[0].userID)
     
-             const current_userID = data[0].userID;
+            const current_userID = data[0].userID;
             const current_uuid = data[0].id;
+            const current_fname = data[0].uFirstName
     
-            return {current_userID, current_uuid};
+            return {current_userID, current_uuid, current_fname};
         }
         catch (error){console.log("Error: ", error)}
         

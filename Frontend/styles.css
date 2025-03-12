@@ -1,5 +1,5 @@
 :root{
-    --totalbg: #ede9e9;
+    --totalbg: #e2dede;
     --todoboxColor: #fdfcfc;
     --todoItemColor: #f8fafa;
     --addbtnColor: #0789a6;
@@ -9,6 +9,21 @@
 
     --loginbtn: #04abd0;
     --smalltxt: #bebdbd;
+
+    
+}
+
+.dark-mode{
+    --totalbg: #141414;
+    --todoboxColor: #2b2c33;
+    --todoItemColor: #233535;
+    --addbtnColor: #09a5c8;
+    --normaltxt: #f9f8f5;
+    --deletebg: #b50514;
+    --darkbgtxt: #ffffff;
+
+    --loginbtn: #04abd0;
+    --smalltxt: #d1d7da;
 }
 
 *{
@@ -20,7 +35,7 @@
 
 body{
     background-color: var(--totalbg);
-    padding: 0.5rem;
+    padding: 0;
 }
 
 a{
@@ -29,6 +44,34 @@ a{
 }
 body{
     margin: 0;
+}
+
+.navbar-container{
+    background-color: var(--todoboxColor);
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    padding: 0.5rem;
+}
+
+.fa-sun{
+    margin-right: 1rem;
+    
+}
+ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    margin-right: 0.1rem;
+}
+li{
+    margin: 0 0.25rem;
+    justify-content: center;
+
 }
 .delete-icon{
     background-color: var(--deletebg);
