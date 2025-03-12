@@ -96,6 +96,11 @@ body{
 
 .todo-item .todo-content{
     width: 80%;
+    min-height: 1.5rem;
+    max-height: 2.5rem;
+    display: inline-block;
+    overflow-y: auto;
+
 }
 .todo-content span{
     padding-left: 5px;

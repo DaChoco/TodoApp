@@ -42,6 +42,18 @@ window.addEventListener("load", async function(){
         })
     })
 
+    maincontent.forEach((txt, index) =>{
+        txt.addEventListener("keypress", async function(event){
+            if (event.key == "Enter"){
+                document.querySelectorAll('.todotxt br').forEach(br => br.remove())
+                txt.blur();
+                newItem = txt.textContent
+                await updateTodo(newItem, arrayIDs[index])
+                
+            }
+        })
+    })
+
     addbtn.addEventListener("click", async function(){
         const categ = document.getElementById("todocat")
         let choice = categ.options[categ.selectedIndex].value
@@ -58,10 +70,10 @@ window.addEventListener("load", async function(){
             let response = await fetch(url, {method: "DELETE"})
             let data = await response.json()
     
-            if (data.success == false){
+            if (data.Success == false){
                 alert("Todo deletion has failed")
             }
-            else if (data.success == true)
+            else if (data.Success == true)
                 alert("Todo deleted successfully")
                 arrayIDs = await fetchTodos(current_userID)
         }
@@ -143,8 +155,32 @@ window.addEventListener("load", async function(){
     
     }
 
+    async function updateTodo(newContent, ID){
+        let backendurl = `http://127.0.0.1:5000/update/${ID}`
+
+        let completeurl = `${backendurl}?ed=${encodeURIComponent(newContent)}`
+
+        try{
+            let response = await fetch(completeurl, {method: 'PUT'})
+            let data = await response.json()
+            console.log(data)
+
+            if (data.success = true){
+                alert("Todo has been updated")
+            }
+            else{
+                alert(f`Todo has failed to update due to the following error: ${e}`)
+            }
+        }
+        catch (error){
+            console.log(error)
+        }
+
+    }
+
    
 })
+
 
 
 

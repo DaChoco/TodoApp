@@ -9,9 +9,13 @@ CORS(app)
 
 conn = pymysql.connect(host=hostname, user=username, password=passwdname, database=databasename, port=3300, cursorclass=pymysql.cursors.DictCursor)
 
+class userSignedIn():
+    def __init__(self, ID):
+        self.ID = ID
+
 #all my stuff gets returned as a dict
 
-def extractUsers():
+def extractUsers(): #currently extracts user info on load. When login is done, I'll instead have that variable saved
     cursor = conn.cursor()
     try:
         cursor.execute("SELECT userID, uFirstName, uLastName FROM tblUsers WHERE userID = %s", (1,))
@@ -31,7 +35,7 @@ def extractTasks(userID):
     except pymysql.Error as e:
         return jsonify({"Message": f"An error has occured: {e}"}), 404
     
-def sendTasks(content, category, userId):
+def sendTasks(content, category, userId): #new todo in the list for a user
     cursor = conn.cursor()
     try:
         SQLString = "INSERT INTO tblTodo (content, dateCreated, category, userID) VALUES (%s, current_timestamp(), %s, %s)"
