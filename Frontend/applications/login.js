@@ -1,4 +1,23 @@
-const loggedIn = false
+export {userID as uID, loggedIn}
+let loggedIn = false
+
+const emailbox = document.getElementById("email")
+const passwd = document.getElementById("password")
+const submitbtn = document.getElementById("loginbtnsubmit")
+
+
+
+
+submitbtn.addEventListener("click", async (e) =>{
+    e.preventDefault()
+    let txtemail = emailbox.value
+    let txtpass = passwd.value
+    await login(txtemail,txtpass)
+
+
+})
+
+
 async function login(email, passwd){
     let url = "http://127.0.0.1:5000/login"
 
@@ -7,10 +26,14 @@ async function login(email, passwd){
     email: email, 
     password: passwd}
 
+    console.log(jsonOBJ)
+
     try{
         response = await fetch(url, {
             method: "POST",
-            headers:{"Content-Type": "application/json"},
+            headers:{"Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+            },
             body: JSON.stringify(jsonOBJ)})
         if (!response.ok) {
             throw new Error(`Recieved an HTTP error. Status: ${response.status}`);
@@ -18,7 +41,7 @@ async function login(email, passwd){
 
         let data = await response.json()
 
-        if (data.LoginStatus ==="Failed"){
+        if (data.LoginStatus =="Failed"){
             alert(data.Message)
         }
         else{
@@ -27,6 +50,7 @@ async function login(email, passwd){
     
             localStorage.setItem("IDnum", data.UserID)
             let userID = data.UserID
+            
             return userID
         }
 

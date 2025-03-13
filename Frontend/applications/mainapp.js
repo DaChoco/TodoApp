@@ -1,8 +1,16 @@
+
 const maxRetries = 3 //this is meant for the occasional client/network errors
 
 //Main javascript work? Complete
 
 window.addEventListener("DOMContentLoaded", async function(){
+    const lightdark = this.document.querySelector(".fa-sun")
+    const body = this.document.querySelector("body")
+
+    lightdark.addEventListener("click", function(){
+        body.classList.toggle("dark-mode")
+    })
+
     const todobox = document.getElementById("todocont")
     const addbar = document.getElementById("additem")
     const addbtn = document.getElementById("addbtn")
@@ -64,7 +72,7 @@ window.addEventListener("DOMContentLoaded", async function(){
     addbtn.addEventListener("click", async function(){
         const categ = document.getElementById("todocat")
         let choice = categ.options[categ.selectedIndex].value
-        await newTodo(addbar.value, choice)
+        await newTodo(addbar.value, choice, current_userID)
         arrayIDs = await fetchTodos(current_userID)
         addbar.value = ""
     
@@ -149,8 +157,8 @@ window.addEventListener("DOMContentLoaded", async function(){
     
     
     
-    async function newTodo(content, category){
-        let backendurl = 'http://127.0.0.1:5000/sendtasks'
+    async function newTodo(content, category, uid){
+        let backendurl = `http://127.0.0.1:5000/sendtasks/${uid}`
     
         let completeurl = `${backendurl}?con=${encodeURIComponent(content)}&cat=${encodeURIComponent(category)}`
         try{

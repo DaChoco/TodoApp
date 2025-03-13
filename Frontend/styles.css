@@ -13,12 +13,12 @@
     
 }
 
-.dark-mode{
+body.dark-mode{
     --totalbg: #141414;
     --todoboxColor: #2b2c33;
-    --todoItemColor: #233535;
+    --todoItemColor: #e1eaea;
     --addbtnColor: #09a5c8;
-    --normaltxt: #f9f8f5;
+    --normaltxt: #1a1a18;
     --deletebg: #b50514;
     --darkbgtxt: #ffffff;
 

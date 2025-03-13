@@ -77,9 +77,10 @@ def loggingIn(email, passwd):
                             )
                     
         else:
+            
             return jsonify({"LoginStatus": "Succeeded",
-                             "Message": f"Welcome back {userDetail[0]}",
-                             "UserID": userDetail[1],
+                             "Message": f"Welcome back {userDetail["uFirstName"]}",
+                             "UserID": userDetail["userID"],
                              "LoggedIn": "True"})
     except pymysql.Error as e:
         return jsonify({"Message": f"An error has occured: {e}"}) 
@@ -92,8 +93,8 @@ def users():
 def tasks(ID):
     return extractTasks(ID)
 
-@app.route("/sendtasks", methods=["GET"])
-def newTodo():
+@app.route("/sendtasks/<uID>", methods=["GET"])
+def newTodo(uID):
     queryContent = request.args.get("con", "")
     queryCategory = request.args.get("cat", "")
 
@@ -103,7 +104,7 @@ def newTodo():
     elif not queryContent:
         return jsonify({"Message": "Missing todo activity, please type out one"})
     else:
-        return sendTasks(queryContent, queryCategory, 1) #Sends the new record of todo to the database
+        return sendTasks(queryContent, queryCategory, uID) #Sends the new record of todo to the database
 
 @app.route("/login", methods=['Post'])
 def login():
@@ -111,8 +112,17 @@ def login():
     userEmail = data["email"]
     userPass = data["password"]
 
-    return loggingIn(userEmail, userPass)
+    if not userEmail:
+        print("No email")
+        return jsonify({"Message": "Missing Email!"})
+        
+    elif not userPass:
+        print("No password")
+        return jsonify({"Message": "Missing Password!"})
+    else:
+        return loggingIn(userEmail, userPass)
 
+#todo display and output related commands
 @app.route("/delete/<todoid>", methods=['DELETE'])
 def deletetodo(todoid):
     cursor = conn.cursor()
