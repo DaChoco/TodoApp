@@ -10,7 +10,7 @@ window.addEventListener("DOMContentLoaded", async function(){
     lightdark.addEventListener("click", function(){
         body.classList.toggle("dark-mode")
     })
-
+    const logoutbtn = this.document.getElementById("logout")
     const todobox = document.getElementById("todocont")
     const addbar = document.getElementById("additem")
     const addbtn = document.getElementById("addbtn")
@@ -27,6 +27,10 @@ window.addEventListener("DOMContentLoaded", async function(){
     }
     
     userintro.textContent = `${current_fname}'s TODO APP`
+
+    logoutbtn.addEventListener("click", async function(){
+        await logout()
+    })
 
     deletebtns.forEach((del,index) => {
         del.addEventListener('click', async function(){
@@ -101,13 +105,14 @@ window.addEventListener("DOMContentLoaded", async function(){
 
     async function getUser(){
         try{
-            let response = await fetch('http://127.0.0.1:5000/getuser', {method: 'POST'})
+            let response = await fetch('http://127.0.0.1:5000/getuser', {method: 'POST', credentials: "include"})
             let data = await response.json()
-            console.log(data[0].userID)
+            console.log(data[0])
     
             const current_userID = data[0].userID;
             const current_uuid = data[0].id;
             const current_fname = data[0].uFirstName
+            console.log(current_fname)
     
             return {current_userID, current_uuid, current_fname};
         }
@@ -116,11 +121,11 @@ window.addEventListener("DOMContentLoaded", async function(){
         
     }
     
-    async function fetchTodos(ID){
-        let url = `http://127.0.0.1:5000/gettasks/${ID}`
+    async function fetchTodos(){
+        let url = `http://127.0.0.1:5000/gettasks`
     
         try{
-            let response = await fetch(url)
+            let response = await fetch(url, {method: "POST", credentials: "include"})
             let data = await response.json()
             console.log(data)
             let addingTodo = ""
@@ -154,11 +159,26 @@ window.addEventListener("DOMContentLoaded", async function(){
         }
         catch (error){console.log("Error: ", error)}
     }
+
+    async function logout(){
+        let url = "http://127.0.0.1:5000/logout"
+
+        try{
+            let response = await fetch(url, {method: "POST", credentials: "include"})
+            let data = response.json()
+
+            if (data.Success === true){
+                alert("You have been logged out, thank you")
+            }
+        }
+        catch (error){
+            console.log(error)
+        }
+
+    }
     
-    
-    
-    async function newTodo(content, category, uid){
-        let backendurl = `http://127.0.0.1:5000/sendtasks/${uid}`
+    async function newTodo(content, category){
+        let backendurl = `http://127.0.0.1:5000/sendtasks`
     
         let completeurl = `${backendurl}?con=${encodeURIComponent(content)}&cat=${encodeURIComponent(category)}`
         try{

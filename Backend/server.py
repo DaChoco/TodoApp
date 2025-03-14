@@ -1,33 +1,48 @@
-from flask import Flask, jsonify, request
-from flask_cors import CORS
+from flask import Flask, jsonify, request, session
+from flask_cors import CORS, cross_origin
+from flask_session import Session
 import pymysql
 import pymysql.cursors
 from dbinfo import hostname, passwdname, databasename, username
+from datetime import timedelta
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:3000"}}, supports_credentials=True)
+
+app.secret_key = "abcd-1234Maile-IStheGreatestOAT"
+
+app.permanent_session_lifetime = timedelta(days=1)
+app.config["SESSION_TYPE"] = "filesystem"  # Store sessions in files
+app.config["SESSION_PERMANENT"] = True
+app.config["SESSION_COOKIE_SECURE"] = True  # Required for cross-site cookies
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+Session(app)
 
 conn = pymysql.connect(host=hostname, user=username, password=passwdname, database=databasename, port=3300, cursorclass=pymysql.cursors.DictCursor)
 
-class userSignedIn():
-    def __init__(self, ID):
-        self.ID = ID
-
 #all my stuff gets returned as a dict
 
-def extractUsers(): #currently extracts user info on load. When login is done, I'll instead have that variable saved
+def extractUsers(): 
     cursor = conn.cursor()
+    userID = session['userID']
     try:
-        cursor.execute("SELECT userID, uFirstName, uLastName FROM tblUsers WHERE userID = %s", (1,))
-        userDisplay = cursor.fetchall()
-        output = jsonify(userDisplay)   
-        return output
+        if not userID:
+            print("You are currently not logged in, make sure to log in.")
+            return jsonify({"Message": "You are currently not logged in, make sure to log in."})
+        else:
+            cursor.execute("SELECT userID, uFirstName, uLastName FROM tblUsers WHERE userID = %s", (userID,))
+            userDisplay = cursor.fetchall()
+            print(userDisplay)
+            output = jsonify(userDisplay)  
+            return output
     except pymysql.Error as e:
         print("Skill issue")
         return jsonify({"Message": f"An error has occured: {e}"})
 
 def extractTasks(userID):
     cursor = conn.cursor()
+    ID = userID
+    print(ID)
     try:
         cursor.execute("SELECT * FROM tbltodo WHERE UserID = %s", (userID,))
         taskDisplay = cursor.fetchall()
@@ -61,7 +76,24 @@ def sendTasks(content, category, userId): #new todo in the list for a user
         response_msg = {"Message": f"An unexpected error has occured {e}"}
         conn.rollback()
         return jsonify(response_msg)
- 
+    
+def registering(fname, lname, email, password:str):
+    cursor = conn.cursor()
+
+    if len(password) < 6:
+        return jsonify({"Message": "This password is too short. It must be at least 6 characters"})
+    elif password.isalpha() == False:
+        return jsonify({"Message": "This password needs at least one number within it"})
+    else:
+        try:
+            cursor.execute("INSERT INTO tblTodos (uFirstName, uLastName, uEmail, uPassword) VALUES (%s, %s, %s, %s)")
+            conn.commit()
+            return jsonify({"Message": "Congratulations, you have been registered"})
+        except pymysql.DatabaseError as e:
+            return jsonify({"Message": str(e)})
+        except pymysql.MySQLError as e:
+            return jsonify({"Message": str(e)})
+        
 def loggingIn(email, passwd):
     cursor = conn.cursor()
     try:
@@ -72,41 +104,24 @@ def loggingIn(email, passwd):
         if not userDetail: 
             return jsonify({"LoginStatus": "Failed",
                             "Message": "This user does not exist on the system, they must register",
-                            "UserID": "NONE",
-                            "LoggedIn": "False"}
+                            "userID": "NONE",
+                            "LoggedIn": False}
                             )
                     
         else:
-            
+            session.permanent = True
+            session["userID"] = userDetail["userID"]
+            print(session)
+
             return jsonify({"LoginStatus": "Succeeded",
                              "Message": f"Welcome back {userDetail["uFirstName"]}",
-                             "UserID": userDetail["userID"],
-                             "LoggedIn": "True"})
+                             "userID": session["userID"],
+                             "LoggedIn": True})
     except pymysql.Error as e:
         return jsonify({"Message": f"An error has occured: {e}"}) 
 
-@app.route("/getuser", methods=['POST'])
-def users():
-    return extractUsers()
-
-@app.route("/gettasks/<ID>", methods=['GET'])
-def tasks(ID):
-    return extractTasks(ID)
-
-@app.route("/sendtasks/<uID>", methods=["GET"])
-def newTodo(uID):
-    queryContent = request.args.get("con", "")
-    queryCategory = request.args.get("cat", "")
-
-
-    if not queryCategory:
-        return jsonify({"Message": "Missing category, please select at least one"})
-    elif not queryContent:
-        return jsonify({"Message": "Missing todo activity, please type out one"})
-    else:
-        return sendTasks(queryContent, queryCategory, uID) #Sends the new record of todo to the database
-
 @app.route("/login", methods=['Post'])
+@cross_origin(supports_credentials=True)
 def login():
     data = request.get_json()
     userEmail = data["email"]
@@ -155,8 +170,42 @@ def updatetodo(todoid):
     finally:
         cursor.close()
 
+@app.route("/logout", methods=["POST"])
+def logout():
+    session.clear()
+    return jsonify({"Message": "Logout successful!", "Success": True})
+
+@app.route("/getuser", methods=['POST'])
+@cross_origin(supports_credentials=True)
+def users():
+    print(session)
+    try:
+        return extractUsers()
+    except KeyError:
+        print("This session appears to not exist")
+        return jsonify({"Message": "No session"})
+
+@app.route("/gettasks", methods=['POST'])
+@cross_origin(supports_credentials=True)
+def tasks():
+    print(session["userID"])
+    return extractTasks(session["userID"])
+
+@app.route("/sendtasks", methods=["GET"])
+def newTodo():
+    queryContent = request.args.get("con", "")
+    queryCategory = request.args.get("cat", "")
+
+
+    if not queryCategory:
+        return jsonify({"Message": "Missing category, please select at least one"})
+    elif not queryContent:
+        return jsonify({"Message": "Missing todo activity, please type out one"})
+    else:
+        return sendTasks(queryContent, queryCategory, session["userID"]) #Sends the new record of todo to the database
+
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5000, host="127.0.0.1")
 
 conn.close()

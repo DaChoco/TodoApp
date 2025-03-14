@@ -1,11 +1,17 @@
-export {userID as uID, loggedIn}
 let loggedIn = false
 
 const emailbox = document.getElementById("email")
 const passwd = document.getElementById("password")
 const submitbtn = document.getElementById("loginbtnsubmit")
+const logoutbtn = document.getElementById("logout")
 
+console.log(logoutbtn)
+window.addEventListener("DOMContentLoaded", function(){
+    logoutbtn.addEventListener("click", async function(){
+        await logout()
+    })
 
+})
 
 
 submitbtn.addEventListener("click", async (e) =>{
@@ -13,9 +19,26 @@ submitbtn.addEventListener("click", async (e) =>{
     let txtemail = emailbox.value
     let txtpass = passwd.value
     await login(txtemail,txtpass)
-
-
 })
+
+async function logout(){
+    let url = "http://127.0.0.1:5000/logout"
+
+    try{
+        let response = await fetch(url, {method: "POST"})
+        let data = await response.json()
+
+        print(data)
+
+        if (data.Success == true){
+            alert("You have been logged out, thank you")
+        }
+    }
+    catch (error){
+        console.log(error)
+    }
+
+}
 
 
 async function login(email, passwd){
@@ -24,15 +47,20 @@ async function login(email, passwd){
     const jsonOBJ = 
     {
     email: email, 
-    password: passwd}
+    password: passwd
+    }
 
     console.log(jsonOBJ)
 
     try{
         response = await fetch(url, {
             method: "POST",
+            credentials: "include",
             headers:{"Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*"
+                    "Access-Control-Allow-Origin": "*",
+                    'Access-Control-Allow-Headers': "*",
+                    'Access-Control-Allow-Methods': "*",
+
             },
             body: JSON.stringify(jsonOBJ)})
         if (!response.ok) {
@@ -48,7 +76,7 @@ async function login(email, passwd){
             alert(data.Message)
             loggedIn = data.LoggedIn
     
-            localStorage.setItem("IDnum", data.UserID)
+            localStorage.setItem("IDnum", data.userID)
             let userID = data.UserID
             
             return userID
