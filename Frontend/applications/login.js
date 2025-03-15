@@ -7,7 +7,8 @@ const logoutbtn = document.getElementById("logout")
 
 console.log(logoutbtn)
 window.addEventListener("DOMContentLoaded", function(){
-    logoutbtn.addEventListener("click", async function(){
+    logoutbtn.addEventListener("click", async function(e){
+        e.preventDefault()
         await logout()
     })
 
@@ -59,7 +60,7 @@ async function login(email, passwd){
             headers:{"Content-Type": "application/json",
                     "Access-Control-Allow-Origin": "*",
                     'Access-Control-Allow-Headers': "*",
-                    'Access-Control-Allow-Methods': "*",
+                    'Access-Control-Allow-Methods': "*"
 
             },
             body: JSON.stringify(jsonOBJ)})

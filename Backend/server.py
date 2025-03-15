@@ -18,7 +18,7 @@ app.config["SESSION_COOKIE_SECURE"] = True  # Required for cross-site cookies
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 Session(app)
 
-conn = pymysql.connect(host=hostname, user=username, password=passwdname, database=databasename, port=3300, cursorclass=pymysql.cursors.DictCursor)
+conn = pymysql.connect(host=hostname, user=username, password=passwdname, database=databasename, port=3306, cursorclass=pymysql.cursors.DictCursor)
 
 #all my stuff gets returned as a dict
 
@@ -77,22 +77,29 @@ def sendTasks(content, category, userId): #new todo in the list for a user
         conn.rollback()
         return jsonify(response_msg)
     
-def registering(fname, lname, email, password:str):
+def registering(fname, lname, email, password1:str, password2: str):
     cursor = conn.cursor()
 
-    if len(password) < 6:
-        return jsonify({"Message": "This password is too short. It must be at least 6 characters"})
-    elif password.isalpha() == False:
-        return jsonify({"Message": "This password needs at least one number within it"})
+    if len(password1) < 6:
+        return jsonify({"Message": "This password is too short. It must be at least 6 characters. Try again", "Success": False})
+    elif password1 != password2:
+      return jsonify({"Message": "The following passwords must match", "Success": False})  
+    elif password1.isalpha() == True:
+        return jsonify({"Message": "This password needs at least one number within it", "Success": False})
     else:
         try:
-            cursor.execute("INSERT INTO tblTodos (uFirstName, uLastName, uEmail, uPassword) VALUES (%s, %s, %s, %s)")
+            sql_params = (fname, lname, email, password1)
+            cursor.execute("INSERT INTO tblUsers (uFirstName, uLastName, uEmail, uPassword) VALUES (%s, %s, %s, %s)", sql_params)
             conn.commit()
-            return jsonify({"Message": "Congratulations, you have been registered"})
+            cursor.execute("SELECT userID FROM tblUsers WHERE uEmail = %s ", (email,))
+            newUserID = cursor.fetchone()
+            session["userID"] = newUserID["userID"] #adding to the session
+            print(newUserID)
+            return jsonify({"Message": "Congratulations, you have been registered", "Success": True})
         except pymysql.DatabaseError as e:
-            return jsonify({"Message": str(e)})
-        except pymysql.MySQLError as e:
-            return jsonify({"Message": str(e)})
+            return jsonify({"Message": str(e), "Success": False})
+        except pymysql.Error as e:
+            return jsonify({"Message": str(e), "Success": False})
         
 def loggingIn(email, passwd):
     cursor = conn.cursor()
@@ -119,6 +126,8 @@ def loggingIn(email, passwd):
                              "LoggedIn": True})
     except pymysql.Error as e:
         return jsonify({"Message": f"An error has occured: {e}"}) 
+    finally:
+        cursor.close()
 
 @app.route("/login", methods=['Post'])
 @cross_origin(supports_credentials=True)
@@ -136,6 +145,28 @@ def login():
         return jsonify({"Message": "Missing Password!"})
     else:
         return loggingIn(userEmail, userPass)
+    
+@app.route("/register", methods=['POST'])
+@cross_origin(supports_credentials=True)
+def register():
+    data = request.get_json()
+    print(data)
+    fname = data['firstname']
+    lname = data['lastname']
+    email = data['mail']
+    password1 = data['passwordfirst']
+    password2 = data['passwordsecond']
+
+    print(password1)
+    
+    if not email:
+        return jsonify({"Message": "You need to type an email"})
+    elif not fname:
+        return jsonify({"Message": "You need to type an email"})
+    elif not password1:
+        return jsonify({"Message": "You need to type an password"})
+    else:
+        return registering(fname, lname, email, password1, password2)
 
 #todo display and output related commands
 @app.route("/delete/<todoid>", methods=['DELETE'])
@@ -153,8 +184,11 @@ def deletetodo(todoid):
         return jsonify({"Success": False, "Message": f"A database error has occured {e}"})
     finally:
         cursor.close()
+
 @app.route("/update/<todoid>", methods=['PUT'])
+@cross_origin(supports_credentials=True)
 def updatetodo(todoid):
+
     cursor = conn.cursor()
     query = request.args.get("ed", "")
     try:
@@ -171,6 +205,7 @@ def updatetodo(todoid):
         cursor.close()
 
 @app.route("/logout", methods=["POST"])
+@cross_origin(supports_credentials=True)
 def logout():
     session.clear()
     return jsonify({"Message": "Logout successful!", "Success": True})
@@ -191,10 +226,12 @@ def tasks():
     print(session["userID"])
     return extractTasks(session["userID"])
 
-@app.route("/sendtasks", methods=["GET"])
+@app.route("/sendtasks", methods=["POST"])
+@cross_origin(supports_credentials=True)
 def newTodo():
     queryContent = request.args.get("con", "")
     queryCategory = request.args.get("cat", "")
+    print(session)
 
 
     if not queryCategory:

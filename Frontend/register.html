@@ -3,9 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Register</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="applications/register.js" defer></script>
 </head>
 <body>
+
+    <header>
+        <div class="navbar-container">
+            <div class="logoenicon"><strong>MY TODO</strong></div>
+
+            <ul>
+                <li id="logout"><strong class="log">Logout</strong></li>
+                <li><a href="/Frontend/index.html">Todo App</a></li>
+                <li><a href="/Frontend/register.html">Login</a></li>
+            
+            </ul>
+
+        </div>
+
+    </header>
+
+    <main class="login-main-container">
+        <div class="login-container">
+            
+            <form>
+                <div class="login-content">
+                    <h1 class="welcometxt">Register</h1>
+
+                    <label for="email"><h3>Email</h3></label>
+                    <input type="text" placeholder="Email" name="email" id="email">
+
+                    <label for="fname"><h3>First Name</h3></label>
+                    <input type="text" placeholder="First Name" name="fname" id="fname">
+
+                    <label for="lname"><h3>Last Name</h3></label>
+                    <input type="text" placeholder="Last Name" name="lname" id="lname">
+
+                    <label for="password1"><h3>Password</h3></label>
+                    <input type="text" placeholder="Password" name="password1" id="password1">
+                    
+                    <label for="password2"><h3>Confirm Password</h3></label>
+                    <input type="text" placeholder="Password" name="password2" id="password2">
+
+                    <input type="submit" value="Login" id="loginbtnsubmit" class="Submit-btn">
+                    <span class="NotLine">Already member of the system?<h2><a href="login.html">login</a></h2></span>
+            </form>
+
+            <!--Password note-->
+            <div class="note-container">
+                <p>Passwords must: </p>
+                <ul class="password-traits">
+                    <li>Have at least 6 characters</li>
+                    <li>Must contain at least 1 number</li>
+                </ul>
+            </div>
+                
+            </div>
+        </div>
+    </main>
     
 </body>
 </html>

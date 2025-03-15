@@ -64,6 +64,7 @@ window.addEventListener("DOMContentLoaded", async function(){
     maincontent.forEach((txt, index) =>{
         txt.addEventListener("keypress", async function(event){
             if (event.key == "Enter"){
+                console.log("Shine on")
                 document.querySelectorAll('.todotxt br').forEach(br => br.remove())
                 txt.blur();
                 newItem = txt.textContent
@@ -182,7 +183,7 @@ window.addEventListener("DOMContentLoaded", async function(){
     
         let completeurl = `${backendurl}?con=${encodeURIComponent(content)}&cat=${encodeURIComponent(category)}`
         try{
-            let response = await fetch(completeurl)
+            let response = await fetch(completeurl,{method: "POST", credentials: "include"})
             let data = await response.json()
             console.log(data)
             return JSON.stringify(data)
@@ -218,7 +219,7 @@ window.addEventListener("DOMContentLoaded", async function(){
     }
 
    
-})
+}, {once: true})
 
 
 
